@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:background="#DFE4EC"
+        android:elevation="20dp"
+        android:fadingEdgeLength="10dp"
+        android:gravity="center|center_vertical"
+        android:theme="@style/AppTheme.NoActionBarBG"
+        app:elevation="10dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            app:layout_scrollFlags="enterAlways|snap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:outlineAmbientShadowColor="#00E70808"
+            android:outlineSpotShadowColor="#00140C0C"
+            android:textAlignment="center">
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="cursive"
+                android:gravity="center"
+                android:includeFontPadding="true"
+                android:padding="3dp"
+                android:text="Liftonia"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="#111111"
+                android:textSize="30sp" />
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraint_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="60dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/cust_btn"
+                android:fontFamily="@font/assistant_semibold"
+                android:onClick="SignIn"
+                android:text="SIGN IN"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="#EAEBEC"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:theme="@style/AppTheme.Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editText6" />
+
+            <EditText
+                android:id="@+id/editText4"
+                android:layout_width="340dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="150dp"
+                android:layout_marginEnd="24dp"
+                android:width="@dimen/email_password"
+                android:ems="10"
+                android:fontFamily="@font/assistant_semibold"
+                android:hint="@string/email_text"
+                android:inputType="textEmailAddress"
+                android:shadowColor="@color/common_google_signin_btn_text_dark_focused"
+                android:textColor="#ACBCD1"
+                android:textColorHighlight="#FFFFFF"
+                android:textColorHint="#9BAABD"
+                android:textColorLink="@android:color/holo_green_dark"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <EditText
+                android:id="@+id/editText6"
+                style="@style/Widget.AppCompat.EditText"
+                android:layout_width="340dp"
+                android:layout_height="41dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                android:width="@dimen/email_password"
+                android:ems="10"
+                android:fontFamily="@font/assistant_semibold"
+                android:hint="@string/password_text"
+                android:inputType="textPassword"
+                android:textColor="#ACBCD1"
+                android:textColorHighlight="#FFFFFF"
+                android:textColorHint="#9BAABD"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editText4"
+
+                app:passwordToggleDrawable="@drawable/icon_selector"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="@color/conv_to_material_them_btn" />
+
+            <TextView
+                android:id="@+id/textView5"
+                style="@android:style/Widget.Holo.Light.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:onClick="forgotPassword"
+                android:outlineProvider="background"
+                android:textColor="#C45959"
+                android:visibility="gone"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editText6" />
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showHidePassword"
+                android:tag="visible"
+                app:layout_constraintBottom_toBottomOf="@+id/editText6"
+                app:layout_constraintEnd_toEndOf="@+id/editText6"
+                app:layout_constraintHorizontal_bias="0.961"
+                app:layout_constraintStart_toStartOf="@+id/editText6"
+                app:layout_constraintTop_toTopOf="@+id/editText6"
+                app:layout_constraintVertical_bias="0.536" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="20dp"
+                android:text="Not registered? | Sign Up!"
+                android:textColor="#F0EFE9"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</LinearLayout>

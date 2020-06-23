@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:icon="@drawable/ic_person_pin_circle_black_24dp"
+            android:title="Maps" />
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_assignment_black_24dp"
+            android:title="History" />
+        <item
+            android:id="@+id/nav_tutorial"
+            android:icon="@drawable/ic_help_black_24dp"
+            android:title="Tutorial"/>
+    </group>
+
+    <item android:title="User Settings">
+        <menu>
+            <item android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="Logout"/>
+            <item android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_my_location_black_24dp"
+                android:title="Turn On GPS"/>
+        </menu>
+    </item>
+</menu>
