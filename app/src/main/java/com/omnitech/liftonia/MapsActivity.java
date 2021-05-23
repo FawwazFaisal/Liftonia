@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -49,6 +50,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -66,12 +68,17 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
+import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
+import com.google.maps.model.DirectionsStep;
+import com.google.maps.model.EncodedPolyline;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@SuppressLint({"ClickableViewAccessibility", "MissingPermission"})
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     //saves the custoer ID if user is active as cust<-SearchRide
@@ -97,6 +104,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int ENABLE_WIFI_CODE = 159;
     static boolean locationStatus;
     static boolean permissionStatus;
+    List<LatLng> path = new ArrayList();
 
     boolean mapsExecuted = false;
     boolean terrainView = false;
@@ -238,7 +246,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (documentSnapshot != null && documentSnapshot.exists()) {
                             Map<String, Object> allCol = documentSnapshot.getData();
                             for (Map.Entry<String, Object> entry : allCol.entrySet()) {
-                                if (entry.getKey().contains("CustomerRef")){
+                                if (entry.getKey().contains("CustomerRef")) {
                                     if (!documentSnapshot.getString(entry.getKey()).equals("empty")) {
                                         String custID = documentSnapshot.getString(entry.getKey());
                                         FirebaseFirestore.getInstance().collection("Customers").document(custID).delete();
@@ -257,7 +265,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     db.collection(("Bookings")).document(sharedPreferences.getString(CAPID4CUST, ""))
                             .update(sharedPreferences.getString(CUST_FIELD_NAME_IN_BOOKING, ""), "empty",
-                                    "Seats", seats+1);
+                                    "Seats", seats + 1);
                     db.collection("Customers").document(CustBookingID).delete();
                     sharedPreferences.edit().remove(CUSTBOOKED).apply();
                     sharedPreferences.edit().remove(CUSTUID).apply();
@@ -324,7 +332,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 if (task.isSuccessful()) {
                                                     DocumentSnapshot doc = task.getResult();
-                                                    if(doc!=null && doc.exists()){
+                                                    if (doc != null && doc.exists()) {
                                                         if (!doc.getString("CustomerRef1").equals("empty")) {
                                                             Customers.add(doc.getString("CustomerRef1"));
                                                         }
@@ -393,7 +401,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                     if (task.isSuccessful()) {
                                                         DocumentSnapshot documentSnapshot = task.getResult();
-                                                        if(documentSnapshot!=null && documentSnapshot.exists()){
+                                                        if (documentSnapshot != null && documentSnapshot.exists()) {
                                                             String[] capLatLng = documentSnapshot.getString("CapLatLng").split(",");
                                                             double captLat = Double.parseDouble(capLatLng[0]);
                                                             double capLng = Double.parseDouble(capLatLng[1]);
@@ -412,9 +420,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                                             else {
                                                                 CaptainMarker.setPosition(CapLatLng);
                                                             }
-                                                        }
-                                                        else{
-                                                            isCustBooked=false;
+                                                        } else {
+                                                            isCustBooked = false;
                                                             startActivity(new Intent(MapsActivity.this, MapsActivity.class));
                                                         }
                                                     }
@@ -456,7 +463,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         boolean netState = networkInfo != null && networkInfo.isConnected();
-        if(!netState){
+        if (!netState) {
             progressBar.setVisibility(View.VISIBLE);
             Snackbar.make(drawer, "Please connect to the internet", Snackbar.LENGTH_INDEFINITE)
                     .setAction("ENABLE", new View.OnClickListener() {
@@ -469,8 +476,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .show();
         }
     }
-
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         //set UI params
@@ -655,12 +660,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                             ArrayList<String> fieldNames = new ArrayList<>();
                                             Map<String, Object> allCol = documentSnapshot.getData();
                                             for (Map.Entry<String, Object> entry : allCol.entrySet()) {
-                                                if (entry.getKey().contains("CustomerRef")){
+                                                if (entry.getKey().contains("CustomerRef")) {
                                                     if (documentSnapshot.getString(entry.getKey()).equals("empty")) {
                                                         capRef.update(entry.getKey(), CustBookingID);
                                                         sharedPreferences.edit().putString(CUST_FIELD_NAME_IN_BOOKING, entry.getKey()).apply();
                                                         Toast.makeText(MapsActivity.this, "Booked Successfully", Toast.LENGTH_SHORT).show();
-                                                        capRef.update("Seats", seats-1);
+                                                        capRef.update("Seats", seats - 1);
                                                         startActivity(new Intent(MapsActivity.this, MapsActivity.class));
                                                         break;
                                                     }
@@ -727,7 +732,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot documentSnapshot = task.getResult();
-                            if(documentSnapshot!=null && documentSnapshot.exists() ){
+                            if (documentSnapshot != null && documentSnapshot.exists()) {
                                 String[] capLatLng = documentSnapshot.getString("CapLatLng").split(",");
                                 double captLat = Double.parseDouble(capLatLng[0]);
                                 double capLng = Double.parseDouble(capLatLng[1]);
@@ -747,8 +752,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 else {
                                     CaptainMarker.setPosition(CapLatLng);
                                 }
-                            }
-                            else{
+                            } else {
                                 cancelRide();
                             }
                         }
@@ -869,7 +873,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void AddMarkers(String Name, String SID, String PhNo, int seats, String StartTime, String ID, LatLng latLng) {
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
-                .title("Tap to book").snippet(String.format("Name: %s\nSID: %s\nPhone: %s\nLeaves at: %s\nSeats Available: %s\n%s", Name, SID, PhNo, StartTime, String.valueOf(seats), ID))
+                .title("Tap to book").snippet(String.format("Name: %s\nSID: %s\nPhone: %s\nLeaves at: %s\nSeats Available: %s\n%s", Name, SID, PhNo, StartTime, seats, ID))
                 .alpha(0.9f)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.helmet)).draggable(false);
         CapMarkers.add(mGoogleMap.addMarker(markerOptions));
@@ -899,12 +903,49 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     )
             );
         }
-        directions.alternatives(true);
+        directions.alternatives(false);
         Log.d("calcDir", "calculateDirections: destination: " + destination.toString());
         directions.setCallback(new PendingResult.Callback<DirectionsResult>() {
             @Override
             public void onResult(DirectionsResult result) {
-                Log.d("calcDir", "onResult: routes: " + result.routes[0].toString());
+                if (result.routes != null && result.routes.length > 0 && result.routes[0].legs != null) {
+                    DirectionsRoute route = result.routes[0];
+                    for (int i = 0; i < route.legs.length; i++) {
+                        DirectionsLeg leg = route.legs[i];
+                        if (leg.steps != null) {
+                            for (int j = 0; j < leg.steps.length; j++) {
+                                DirectionsStep step = leg.steps[j];
+                                if (step.steps != null && step.steps.length > 0) {
+                                    for (int k = 0; k < step.steps.length; k++) {
+                                        DirectionsStep step1 = step.steps[k];
+                                        EncodedPolyline points1 = step1.polyline;
+                                        if (points1 != null) {
+                                            //Decode polyline and add points to list of route coordinates
+                                            List<com.google.maps.model.LatLng> coords1 = points1.decodePath();
+                                            for (com.google.maps.model.LatLng coord1 : coords1) {
+                                                path.add(new LatLng(coord1.lat, coord1.lng));
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    EncodedPolyline points = step.polyline;
+                                    if (points != null) {
+                                        //Decode polyline and add points to list of route coordinates
+                                        List<com.google.maps.model.LatLng> coords = points.decodePath();
+                                        for (com.google.maps.model.LatLng coord : coords) {
+                                            path.add(new LatLng(coord.lat, coord.lng));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+                if (path.size() > 0) {
+                    PolylineOptions opts = new PolylineOptions().addAll(path).color(Color.BLUE).width(5);
+                    mGoogleMap.addPolyline(opts);
+                }
                 Log.d("calcDir", "onResult: duration: " + result.routes[0].legs[0].duration);
                 Log.d("calcDir", "onResult: distance: " + result.routes[0].legs[0].distance);
                 Log.d("calcDir", "onResult: geocodedWayPoints: " + result.geocodedWaypoints[0].toString());
