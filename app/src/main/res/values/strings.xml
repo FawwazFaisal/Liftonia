@@ -11,6 +11,7 @@
     <string name="confirm_password">" Confirm Password"</string>
     <string name="cell_no" translatable="false">" Phone No"</string>
     <string name="title_activity_maps">Map</string>
+    <string name="map_key">AIzaSyDuJpvwlRXntYjCchHmHlBObWWZiXdBWag</string>
     <string-array name="spinner_items">
         <item>Main Campus</item>
         <item>City Campus</item>

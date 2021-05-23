@@ -73,6 +73,7 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
+import com.google.maps.model.TravelMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -883,6 +884,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("calcDir", "calculateDirections: calculating directions.");
 
         DirectionsApiRequest directions = new DirectionsApiRequest(geoApiContext);
+        directions.mode(TravelMode.DRIVING);
         directions.destination(new com.google.maps.model.LatLng(
                         DesMakrer.getPosition().latitude,
                         DesMakrer.getPosition().longitude
@@ -916,18 +918,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             for (int j = 0; j < leg.steps.length; j++) {
                                 DirectionsStep step = leg.steps[j];
                                 if (step.steps != null && step.steps.length > 0) {
-                                    for (int k = 0; k < step.steps.length; k++) {
-                                        DirectionsStep step1 = step.steps[k];
-                                        EncodedPolyline points1 = step1.polyline;
-                                        if (points1 != null) {
-                                            //Decode polyline and add points to list of route coordinates
-                                            List<com.google.maps.model.LatLng> coords1 = points1.decodePath();
-                                            for (com.google.maps.model.LatLng coord1 : coords1) {
-                                                path.add(new LatLng(coord1.lat, coord1.lng));
-                                            }
-                                        }
-                                    }
-                                } else {
                                     EncodedPolyline points = step.polyline;
                                     if (points != null) {
                                         //Decode polyline and add points to list of route coordinates
@@ -939,7 +929,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 }
                             }
                         }
-
                     }
                 }
                 if (path.size() > 0) {

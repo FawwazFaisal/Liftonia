@@ -1,15 +1,17 @@
 package com.omnitech.liftonia;
 
-import android.app.TimePickerDialog;
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -165,8 +168,8 @@ public class ConfigureRide extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
-                TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
+                DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+                TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
 
                 Calendar calendar = new GregorianCalendar(datePicker.getYear(),
                         datePicker.getMonth(),
@@ -180,12 +183,14 @@ public class ConfigureRide extends AppCompatActivity {
                 calendar.setTimeInMillis(calendar.getTimeInMillis());
                 time.setText((String.valueOf(formatter.format(calendar.getTime()))));
                 alertDialog.dismiss();
-            }});
+            }
+        });
         dialogView.findViewById(R.id.button3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 alertDialog.dismiss();
-            }});
+            }
+        });
         alertDialog.setView(dialogView);
         alertDialog.show();
     }
@@ -276,99 +281,100 @@ public class ConfigureRide extends AppCompatActivity {
                 public void onLocationResult(final LocationResult locationResult) {
                     for (Location location : locationResult.getLocations()) {
                         if (location != null) {
+                            if (ActivityCompat.checkSelfPermission(ConfigureRide.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ConfigureRide.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                finish();
+                                return;
+                            }
                             LocationServices.getFusedLocationProviderClient(ConfigureRide.this).getLastLocation()
-                                    .addOnSuccessListener(new OnSuccessListener<Location>() {
-                                        @Override
-                                        public void onSuccess(Location location) {
-                                            if (location != null) {
-                                                progressBar.setVisibility(View.GONE);
-                                                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                                                currloc = location;
-                                            }
-                                            LatLng latLng = new LatLng(currloc.getLatitude(), currloc.getLongitude());
-                                            //setting ride to HOME from MAIN
-                                            if (latLng.latitude > 24.794795) {
-                                                if (latLng.longitude > 67.136185) {
-                                                    if (latLng.latitude - 24.794795 < 0.004000 && latLng.longitude - 67.136185 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
-                                                } else if (latLng.longitude < 67.136185) {
-                                                    if (latLng.latitude - 24.794795 < 0.004000 && 67.136185 - latLng.longitude < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
+                                    .addOnSuccessListener(location1 -> {
+                                        if (location1 != null) {
+                                            progressBar.setVisibility(View.GONE);
+                                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                            currloc = location1;
+                                        }
+                                        LatLng latLng = new LatLng(currloc.getLatitude(), currloc.getLongitude());
+                                        //setting ride to HOME from MAIN
+                                        if (latLng.latitude > 24.794795) {
+                                            if (latLng.longitude > 67.136185) {
+                                                if (latLng.latitude - 24.794795 < 0.004000 && latLng.longitude - 67.136185 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
+                                                }
+                                            } else if (latLng.longitude < 67.136185) {
+                                                if (latLng.latitude - 24.794795 < 0.004000 && 67.136185 - latLng.longitude < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
                                                 }
                                             }
-                                            if (latLng.latitude < 24.794795) {
-                                                if (latLng.longitude > 67.136185) {
-                                                    if (24.794795 - latLng.latitude < 0.004000 && latLng.longitude - 67.136185 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
-                                                } else if (latLng.longitude < 67.136185) {
-                                                    if (24.794795 - latLng.latitude < 0.004000 && latLng.longitude - 67.136185 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
+                                        }
+                                        if (latLng.latitude < 24.794795) {
+                                            if (latLng.longitude > 67.136185) {
+                                                if (24.794795 - latLng.latitude < 0.004000 && latLng.longitude - 67.136185 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
+                                                }
+                                            } else if (latLng.longitude < 67.136185) {
+                                                if (24.794795 - latLng.latitude < 0.004000 && latLng.longitude - 67.136185 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In Main Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
                                                 }
                                             }
-                                            //setting ride to HOME from CITY
-                                            else if (latLng.latitude > 24.861874) {
-                                                if (latLng.longitude > 67.073479) {
-                                                    if (latLng.latitude - 24.861874 < 0.004000 && latLng.longitude - 67.073479 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
-                                                } else if (latLng.longitude < 67.073479) {
-                                                    if (latLng.latitude - 24.861874 < 0.004000 && 67.073479 - latLng.longitude < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
+                                        }
+                                        //setting ride to HOME from CITY
+                                        else if (latLng.latitude > 24.861874) {
+                                            if (latLng.longitude > 67.073479) {
+                                                if (latLng.latitude - 24.861874 < 0.004000 && latLng.longitude - 67.073479 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
+                                                }
+                                            } else if (latLng.longitude < 67.073479) {
+                                                if (latLng.latitude - 24.861874 < 0.004000 && 67.073479 - latLng.longitude < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
                                                 }
                                             }
-                                            if (latLng.latitude < 24.861874) {
-                                                if (latLng.longitude > 67.073479) {
-                                                    if (24.861874 - latLng.latitude < 0.004000 && latLng.longitude - 67.073479 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
-                                                } else if (latLng.longitude < 67.073479) {
-                                                    if (24.861874 - latLng.latitude < 0.004000 && latLng.longitude - 67.073479 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
+                                        }
+                                        if (latLng.latitude < 24.861874) {
+                                            if (latLng.longitude > 67.073479) {
+                                                if (24.861874 - latLng.latitude < 0.004000 && latLng.longitude - 67.073479 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
+                                                }
+                                            } else if (latLng.longitude < 67.073479) {
+                                                if (24.861874 - latLng.latitude < 0.004000 && latLng.longitude - 67.073479 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In City Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
                                                 }
                                             }
-                                            //setting ride to HOME from NORTH
-                                            if (latLng.latitude > 24.929144) {
-                                                if (latLng.longitude > 67.040552) {
-                                                    if (latLng.latitude - 24.929144 < 0.004000 && latLng.longitude - 67.040552 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
-                                                } else if (latLng.longitude < 67.136185) {
-                                                    if (latLng.latitude - 24.929144 < 0.004000 && 67.040552 - latLng.longitude < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
+                                        }
+                                        //setting ride to HOME from NORTH
+                                        if (latLng.latitude > 24.929144) {
+                                            if (latLng.longitude > 67.040552) {
+                                                if (latLng.latitude - 24.929144 < 0.004000 && latLng.longitude - 67.040552 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
                                                 }
-                                            } else if (latLng.latitude < 24.929144) {
-                                                if (latLng.longitude > 67.040552) {
-                                                    if (24.929144 - latLng.latitude < 0.004000 && latLng.longitude - 67.040552 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
-                                                } else if (latLng.longitude < 67.136185) {
-                                                    if (24.929144 - latLng.latitude < 0.004000 && latLng.longitude - 67.040552 < 0.004000) {
-                                                        Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
-                                                        isInKIET = true;
-                                                    }
+                                            } else if (latLng.longitude < 67.136185) {
+                                                if (latLng.latitude - 24.929144 < 0.004000 && 67.040552 - latLng.longitude < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
                                                 }
                                             }
-                                            if (!isInKIET) {
-                                                spinner.setVisibility(View.VISIBLE);
+                                        } else if (latLng.latitude < 24.929144) {
+                                            if (latLng.longitude > 67.040552) {
+                                                if (24.929144 - latLng.latitude < 0.004000 && latLng.longitude - 67.040552 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
+                                                }
+                                            } else if (latLng.longitude < 67.136185) {
+                                                if (24.929144 - latLng.latitude < 0.004000 && latLng.longitude - 67.040552 < 0.004000) {
+                                                    Toast.makeText(ConfigureRide.this, "In North Campus", Toast.LENGTH_SHORT).show();
+                                                    isInKIET = true;
+                                                }
                                             }
+                                        }
+                                        if (!isInKIET) {
+                                            spinner.setVisibility(View.VISIBLE);
                                         }
                                     });
                         }
@@ -381,7 +387,11 @@ public class ConfigureRide extends AppCompatActivity {
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mLocationRequest.setInterval(2000);
             mLocationRequest.setFastestInterval(1000);
-            fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                finish();
+                return;
+            }
+            fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.getMainLooper());
         }
     }
 
