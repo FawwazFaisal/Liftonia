@@ -2,7 +2,6 @@
     <string name="app_name">Liftonia</string>
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
-    <string name="map_key" translatable="false">AIzaSyC_7uSABb5LmD52YdMOsKaQwDsXH1WUZN8</string>
     <string name="Register_button">Register</string>
     <string name="password_text">" Password"</string>
     <string name="login_button">" Sign in"</string>
